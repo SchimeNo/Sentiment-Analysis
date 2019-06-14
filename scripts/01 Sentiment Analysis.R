@@ -42,44 +42,4 @@ corrplot(corr_high, method = "color", col = col(200), order = "hclust",diag = FA
 #correlation for only iphonesentiment
 iphonecorr<-as.data.frame(corrIPHONE[,59])
 
-iphoneCOR <- iphone
-iphoneCOR$featureToRemove <- NULL
-
-#Variance
-#Features that have very little, or "near zero variance", may or may not have useful information.
-nzvMetrics <- nearZeroVar(iphone, saveMetrics = TRUE)
-nzv <- nearZeroVar(iphone, saveMetrics = FALSE) 
-#remove zero var
-iphoneNZV <- iphone[,-nzv]
-str(iphoneNZV)
-
-####Recursive Feature Elimination ####
-set.seed(123)
-iphoneSample <- iphone[sample(1:nrow(iphone), 100, replace=FALSE),]
-ctrl <- rfeControl(functions = rfFuncs, 
-                   method = "repeatedcv",
-                   repeats = 5,
-                   verbose = FALSE)
-system.time (rfeResults <- rfe(iphoneSample[,1:58], 
-                  iphoneSample$iphonesentiment, 
-                  sizes=(1:58), 
-                  rfeControl=ctrl))
-
-rfeResults
-
-# Plot results
-plot(rfeResults, type=c("g", "o"))
-
-# create new data set with rfe recommended features
-iphoneRFE <- iphone[,predictors(rfeResults)]
-
-# add the dependent variable to iphoneRFE
-iphoneRFE$iphonesentiment <- iphone$iphonesentiment
-
-# review outcome
-str(iphoneRFE)
-
-
-
-
-#stopCluster(cl)
+stopCluster(cl)
